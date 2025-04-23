@@ -6,7 +6,7 @@ Instructions:
 1) Create your own virtual environment
 python3 -m venv .venv
 
-2) Activate your virtual environment
+2) Activate your virtual environment (VSCode terminals often detect the virtual environment automatically)
 source .venv/bin/activate
 
 3) Install dependencies
