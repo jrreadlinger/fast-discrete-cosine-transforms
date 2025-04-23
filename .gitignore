@@ -2,4 +2,4 @@
 .venv/
 
 # Ignore macOS Desktop Services Store
-.DS_Store/
+.DS_Store
