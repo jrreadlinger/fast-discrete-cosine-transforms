@@ -2,7 +2,7 @@ from PIL import Image
 import numpy as np
 import os
 
-from dct.utils import check_image_mode
+from dct.utils import check_image_mode, load_grayscale_image
 
 # def check_image_mode(image_path):
 #     with Image.open(image_path) as img:
@@ -22,5 +22,5 @@ from dct.utils import check_image_mode
 
 
 
-check_image_mode("data/checkerboard_small.png")
+print(load_grayscale_image("data/checkerboard_small.png"))
 check_image_mode("data/checkerboard_large.jpg")

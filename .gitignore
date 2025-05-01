@@ -3,3 +3,6 @@
 
 # Ignore macOS Desktop Services Store
 .DS_Store
+
+# Ignore Python bytecode
+__pycache__/
