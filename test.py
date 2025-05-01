@@ -1,26 +1,24 @@
-from PIL import Image
 import numpy as np
 import os
 
-from dct.utils import check_image_mode, load_grayscale_image
+def save_1d_signals(output_dir="data"):
+    n = 64  # signal length
 
-# def check_image_mode(image_path):
-#     with Image.open(image_path) as img:
-#         print(f"File: {os.path.basename(image_path)}")
-#         print(f" - Mode: {img.mode}")
-#         img_array = np.array(img)
-#         print(f" - Shape: {img_array.shape}")
-#         if img.mode == 'L':
-#             print(" → This is a grayscale image.")
-#         elif img.mode == 'RGB':
-#             print(" → This is an RGB image.")
-#         else:
-#             print(" → Other image mode (e.g., RGBA, CMYK).")
-#         print()
+    # Step function: 0s followed by 1s
+    step = np.concatenate([np.zeros(n // 2), np.ones(n // 2)])
 
-# Example usage:
+    # Sine wave: 1 full period
+    sine = np.sin(2 * np.pi * np.arange(n) / n)
 
+    # Impulse: 1 at the center, 0 elsewhere
+    impulse = np.zeros(n)
+    impulse[n // 2] = 1
 
+    # Save to .npy files
+    os.makedirs(output_dir, exist_ok=True)
+    np.save(os.path.join(output_dir, "step_signal.npy"), step)
+    np.save(os.path.join(output_dir, "sine_signal.npy"), sine)
+    np.save(os.path.join(output_dir, "impulse_signal.npy"), impulse)
 
-print(load_grayscale_image("data/checkerboard_small.png"))
-check_image_mode("data/checkerboard_large.jpg")
+if __name__ == "__main__":
+    save_1d_signals()

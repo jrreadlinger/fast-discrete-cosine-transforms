@@ -1,0 +1,8 @@
+How to load the 1D signals in /data:
+
+    import numpy as np
+
+    step = np.load("data/step_signal.npy")
+    sine = np.load("data/sine_signal.npy")
+    impulse = np.load("data/impulse_signal.npy")
+
