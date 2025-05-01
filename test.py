@@ -1,5 +1,6 @@
 from PIL import Image
 from dct.dct_naive import dct_naive, idct_naive, dct2_naive, idct2_naive, dct2_rgb, idct2_rgb
+from dct.dct_fast import fast_dct_recursive
 from dct.utils import load_grayscale_image
 
 img = Image.open("steve-face.png")
