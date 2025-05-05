@@ -12,3 +12,7 @@ How to load the 1D signals in /data:
     from scipy.fft import dct
 
     potentially go back and fix dct_lee like gpt said
+
+    Why does lee's work to reconstruct a 2d image but fail validation checks like PSNR, SSIM,
+    and simple things like coefficient comparison?
+    Moreover, why do 1D signals have high error after reconstruction?
