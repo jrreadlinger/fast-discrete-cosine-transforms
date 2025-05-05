@@ -294,6 +294,68 @@ def plot_compression_curve_and_examples(image_path, percentages=[1, 5, 10, 25, 5
     plt.savefig("plots/ssim_comparison.png")
     plt.close()
 
+def plot_compression_curve(image_path):
+    block_size = 8
+    img = normalize_image(load_grayscale_image(image_path))
+    blocks, shape = split_into_blocks(img, block_size)
+    dct_blocks = np.zeros_like(blocks, dtype=np.float64)
+    for i in range(blocks.shape[0]):
+        for j in range(blocks.shape[1]):
+            dct_blocks[i, j] = dct2(blocks[i, j])
+
+    percentages = [1, 5, 10, 25, 50, 75, 100]
+    psnrs_square = []
+    psnrs_zigzag = []
+    ssims_square = []
+    ssims_zigzag = []
+
+    for pct in percentages:
+        p = pct / 100.0
+
+        masked_sq = np.zeros_like(dct_blocks)
+        masked_zz = np.zeros_like(dct_blocks)
+
+        for i in range(dct_blocks.shape[0]):
+            for j in range(dct_blocks.shape[1]):
+                masked_sq[i, j] = mask_dct_coefficients(dct_blocks[i, j], int(block_size * p))
+                masked_zz[i, j] = zigzag_mask_dct(dct_blocks[i, j], p)
+
+        rec_sq = np.zeros_like(masked_sq)
+        rec_zz = np.zeros_like(masked_zz)
+        for i in range(masked_sq.shape[0]):
+            for j in range(masked_sq.shape[1]):
+                rec_sq[i, j] = idct2(masked_sq[i, j])
+                rec_zz[i, j] = idct2(masked_zz[i, j])
+
+        img_sq = combine_blocks(rec_sq, shape)
+        img_zz = combine_blocks(rec_zz, shape)
+
+        psnrs_square.append(compute_psnr(img, img_sq))
+        ssims_square.append(compute_ssim(img, img_sq))
+        psnrs_zigzag.append(compute_psnr(img, img_zz))
+        ssims_zigzag.append(compute_ssim(img, img_zz))
+
+    plt.figure()
+    plt.plot(percentages, psnrs_square, marker='o', label="Square Mask")
+    plt.plot(percentages, psnrs_zigzag, marker='x', label="Zigzag Mask")
+    plt.title("PSNR vs % Coefficients Kept")
+    plt.xlabel("% Coefficients")
+    plt.ylabel("PSNR (dB)")
+    plt.legend()
+    plt.grid(True)
+    plt.savefig("plots/psnr_comparison.png")
+    plt.close()
+
+    plt.figure()
+    plt.plot(percentages, ssims_square, marker='o', label="Square Mask")
+    plt.plot(percentages, ssims_zigzag, marker='x', label="Zigzag Mask")
+    plt.title("SSIM vs % Coefficients Kept")
+    plt.xlabel("% Coefficients")
+    plt.ylabel("SSIM")
+    plt.legend()
+    plt.grid(True)
+    plt.savefig("plots/ssim_comparison.png")
+    plt.close()
 
 
 # === CUMULATIVE ENERGY PLOT ===
@@ -339,10 +401,10 @@ if __name__ == "__main__":
     #     plot_image_reconstruction(path, color=True)
     # plot_image_reconstruction("data/nasir_ahmed.png", color=False)
     # plot_image_reconstruction("data/mary.jpg", color=True)
-    plot_runtime_comparison({
-        "Naive DCT": dct2,
-        "Fast DCT (Lee)": dct_lee_2d
-    })
-    # plot_compression_curve_and_examples("data/nasir_ahmed.png")
+    # plot_runtime_comparison({
+    #     "Naive DCT": dct2,
+    #     "Fast DCT (Lee)": dct_lee_2d
+    # })
+    plot_compression_curve("data/nasir_ahmed.png")
 
     print("Plots generated in /plots")
