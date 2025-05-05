@@ -6,3 +6,9 @@ How to load the 1D signals in /data:
     sine = np.load("data/sine_signal.npy")
     impulse = np.load("data/impulse_signal.npy")
 
+    python -m tests.test_dct_validity
+    ^ to test things that use imports from other folders
+
+    from scipy.fft import dct
+
+    potentially go back and fix dct_lee like gpt said
