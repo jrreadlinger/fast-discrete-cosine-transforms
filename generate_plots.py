@@ -19,7 +19,7 @@ from dct.utils import (
 
 os.makedirs("plots", exist_ok=True)
 
-# === 1D RECONSTRUCTION ===
+# 1d reconstruction
 def plot_1d_reconstruction(name, signal):
     X = dct1(signal)
     signal_rec = idct1(X)
@@ -41,7 +41,7 @@ def plot_1d_reconstruction(name, signal):
     plt.close()
 
 
-# === IMAGE RECONSTRUCTION WITH BLOCKS ===
+# image reconstruction with blocks
 # def plot_image_reconstruction(image_path, color=False):
 #     name = os.path.splitext(os.path.basename(image_path))[0]
 #     block_size = 8
@@ -198,14 +198,8 @@ def plot_image_reconstruction(image_path, color=False):
     plt.close()
 
 
-# === RUNTIME COMPARISON (stub for now) ===
+# runtime comparison
 def plot_runtime_comparison(algorithms):
-    """
-    Compare runtime of multiple 2D DCT algorithms with log-scaled timing.
-
-    Args:
-        algorithms: dict of {label: dct_function}, where dct_function accepts a 2D array.
-    """
     sizes = [8, 16, 32, 64, 128]
     timings = {label: [] for label in algorithms}
 
@@ -230,7 +224,7 @@ def plot_runtime_comparison(algorithms):
     plt.close()
 
 
-# === COMPRESSION DEMO ===
+# compression demo
 def plot_compression_curve_and_examples(image_path, percentages=[1, 5, 10, 25, 50, 75, 100], show_examples=True):
     name = os.path.splitext(os.path.basename(image_path))[0]
     img = normalize_image(load_grayscale_image(image_path))
@@ -358,7 +352,7 @@ def plot_compression_curve(image_path):
     plt.close()
 
 
-# === CUMULATIVE ENERGY PLOT ===
+# cumulative energy plot
 def plot_cumulative_energy(signal, name):
     X = dct1(signal)
     sorted_energy = np.sort(np.abs(X)**2)[::-1]
@@ -375,7 +369,6 @@ def plot_cumulative_energy(signal, name):
     plt.close()
 
 
-# === MAIN ===
 if __name__ == "__main__":
     # signals = {
     #     "impulse": np.load("data/impulse_signal.npy"),

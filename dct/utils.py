@@ -4,12 +4,10 @@ import os
 from skimage.metrics import structural_similarity as ssim
 
 
-### IMAGE HELPERS ###
+# Image Helpers
 def load_grayscale_image(image_path):
     """
-    Loads an image from a given path and ensures it's in grayscale ('L') mode.
-    Returns:
-        A 2D numpy array of dtype uint8.
+    load a grayscale image from image path
     """
     with Image.open(image_path) as img:
         if img.mode != 'L':
@@ -18,31 +16,27 @@ def load_grayscale_image(image_path):
 
 def check_image_mode(image_path):
     """
-    Print the mode and shape of the given image.
-    Helps determine if it's grayscale, RGB, or another type.
+    return image mode from image path
     """
     with Image.open(image_path) as img:
         print(f"File: {os.path.basename(image_path)}")
-        print(f" - Mode: {img.mode}")
+        print(f"Mode: {img.mode}")
         img_array = np.array(img)
-        print(f" - Shape: {img_array.shape}")
+        print(f"Shape: {img_array.shape}")
         if img.mode == 'L':
-            print(" → This is a grayscale image.")
+            print("This is a grayscale image")
         elif img.mode == 'RGB':
-            print(" → This is an RGB image.")
+            print("This is an RGB image")
         else:
-            print(" → Other image mode (e.g., RGBA, CMYK).")
+            print("Unknown image mode")
         print()
 
 
-### BLOCK HELPERS ###
+# Block Helpers
 def split_into_blocks(img_array, block_size=8):
     """
-    Split a grayscale or RGB image into non-overlapping blocks.
-    Pads the image with zeros if necessary to match block size.
-
-    Returns:
-        Padded blocks and the original shape (to crop later if needed).
+    split image into 8x8 blocks
+    pad image if necessary to make dimensions divisible by block_size
     """
     h, w = img_array.shape[:2]
     pad_h = (block_size - h % block_size) % block_size
@@ -61,23 +55,17 @@ def split_into_blocks(img_array, block_size=8):
             padded.shape[1] // block_size, block_size, 3
         ).swapaxes(1, 2)
 
-    return blocks, img_array.shape  # return original shape for later cropping
+    return blocks, img_array.shape
 
 def combine_blocks(blocks, original_shape):
     """
-    Reconstruct an image from non-overlapping blocks and crop to original size.
-
-    Args:
-        blocks: Output from split_into_blocks
-        original_shape: (height, width) or (height, width, channels)
-
-    Returns:
-        Cropped reconstructed image
+    reconstruct image from 8x8 blocks
+    crop the padding if necessary
     """
-    if blocks.ndim == 4:  # grayscale
+    if blocks.ndim == 4: # grayscale
         h_blocks, w_blocks, bs, _ = blocks.shape
         image = blocks.swapaxes(1, 2).reshape(h_blocks * bs, w_blocks * bs)
-    else:  # RGB
+    else: # RGB
         h_blocks, w_blocks, bs, _, c = blocks.shape
         image = blocks.swapaxes(1, 2).reshape(h_blocks * bs, w_blocks * bs, c)
 
@@ -86,17 +74,10 @@ def combine_blocks(blocks, original_shape):
     return image[slices]
 
 
-### PERFORMANCE METRIC HELPERS ###
+# Performance Metric Helpers
 def compute_psnr(original, reconstructed, max_pixel=255.0):
     """
-    Compute Peak Signal-to-Noise Ratio between two images.
-
-    Args:
-        original, reconstructed: 2D or 3D NumPy arrays
-        max_pixel: maximum pixel intensity (usually 255)
-
-    Returns:
-        PSNR in dB
+    compute Peak Signal-to-Noise Ratio between two images
     """
     mse = np.mean((original.astype(np.float64) - reconstructed.astype(np.float64)) ** 2)
     if mse == 0:
@@ -105,47 +86,25 @@ def compute_psnr(original, reconstructed, max_pixel=255.0):
 
 def compute_ssim(original, reconstructed, multichannel=True):
     """
-    Compute Structural Similarity Index (SSIM) between two images.
-
-    Args:
-        original, reconstructed: NumPy arrays (grayscale or RGB)
-        multichannel: Set to True if input is color (RGB)
-
-    Returns:
-        SSIM score between 0 and 1
+    compute Structural Similarity Index (SSIM) between two images
     """
     return ssim(original, reconstructed, data_range=255, channel_axis=-1 if multichannel else None)
 
 def verify_inverse_consistency(original, reconstructed, tol=1e-6):
     """
-    Checks if original and reconstructed signals match within a relative tolerance.
-
-    Args:
-        original: original input signal or image (1D, 2D, or 3D array)
-        reconstructed: output after DCT + IDCT
-        tol: relative error threshold (default 1e-6)
-
-    Returns:
-        True if consistent, else False
+    checks if original and reconstructed signals match within a given tolerance
     """
     original = original.astype(np.float64)
     reconstructed = reconstructed.astype(np.float64)
 
     rel_error = np.linalg.norm(original - reconstructed) / np.linalg.norm(original)
-    print(f"[Inverse Check] Relative error: {rel_error:.2e}")
+    print(f"Relative error: {rel_error:.2e}")
     return rel_error < tol
 
 def verify_parseval_identity(original, transformed, tol=1e-6):
     """
-    Verifies Parseval's identity: energy in time domain ≈ energy in frequency domain.
-
-    Args:
-        original: original input signal or image (1D or 2D array)
-        transformed: its DCT coefficients
-        tol: allowed relative error (default 1e-6)
-
-    Returns:
-        True if identity holds within tolerance, else False
+    verifies Parseval's Identity
+    energy in the time domain matches energy in frequency domain
     """
     energy_time = np.sum(np.square(original.astype(np.float64)))
     energy_freq = np.sum(np.square(transformed.astype(np.float64)))
@@ -155,17 +114,10 @@ def verify_parseval_identity(original, transformed, tol=1e-6):
     return rel_error < tol
 
 
-### EXTRA HELPERS ###
+# Extra Helpers
 def mask_dct_coefficients(dct_block, keep=8):
     """
-    Zero out all but the top-left [keep x keep] DCT coefficients of a block.
-
-    Args:
-        dct_block: 2D DCT block
-        keep: how many coefficients to retain from the top-left
-
-    Returns:
-        Masked DCT block
+    zero out all but the top-left DCT coefficients of a block (square)
     """
     keep = int(keep)
     masked = np.zeros_like(dct_block)
@@ -174,6 +126,9 @@ def mask_dct_coefficients(dct_block, keep=8):
 
 # TODO: test this and give it a docstring
 def zigzag_mask_dct(dct_block, keep_fraction):
+    """
+    zero out all but the top-left DCT coefficients of a block (triangle)
+    """
     N = dct_block.shape[0]
     flat = []
     for i in range(2 * N - 1):
@@ -194,13 +149,7 @@ def zigzag_mask_dct(dct_block, keep_fraction):
 
 def normalize_image(img):
     """
-    Normalize an image to 0–255 and convert to uint8.
-
-    Args:
-        img: 2D or 3D NumPy array
-
-    Returns:
-        uint8 image with values in [0, 255]
+    normalize an image to 0–255 pixel values
     """
     img = img - np.min(img)
     if np.max(img) == 0:

@@ -1,15 +1,8 @@
 import numpy as np
 
-# === 1D DCT/IDCT ===
 def dct1(x):
     """
-    Compute the 1D DCT-II of a 1D signal using a naive implementation.
-
-    Args:
-        x (np.ndarray): 1D input signal (real-valued)
-
-    Returns:
-        np.ndarray: DCT coefficients (float64)
+    1 dimensional DCT-II
     """
     N = len(x)
     X = np.zeros(N, dtype=np.float64)
@@ -22,13 +15,7 @@ def dct1(x):
 
 def idct1(X):
     """
-    Compute the 1D Inverse DCT (DCT-III) of a coefficient array.
-
-    Args:
-        X (np.ndarray): DCT coefficients
-
-    Returns:
-        np.ndarray: Reconstructed time-domain signal (float64)
+    1 dimensional DCT-III
     """
     N = len(X)
     x_rec = np.zeros(N, dtype=np.float64)
@@ -38,17 +25,9 @@ def idct1(X):
             x_rec[n] += alpha * X[k] * np.cos(np.pi * k * (n + 0.5) / N)
     return x_rec
 
-
-# === 2D DCT/IDCT ===
 def dct2(block):
     """
-    Compute the 2D DCT-II of a 2D image block.
-
-    Args:
-        block (np.ndarray): 2D array (e.g., 8x8 block)
-
-    Returns:
-        np.ndarray: 2D DCT coefficients
+    2 dimensional DCT-II
     """
     N, M = block.shape
     X = np.zeros((N, M), dtype=np.float64)
@@ -67,13 +46,7 @@ def dct2(block):
 
 def idct2(X):
     """
-    Compute the 2D Inverse DCT (DCT-III) of a coefficient block.
-
-    Args:
-        X (np.ndarray): 2D DCT coefficients
-
-    Returns:
-        np.ndarray: Reconstructed spatial-domain block
+    2 dimensional DCT-III
     """
     N, M = X.shape
     x = np.zeros((N, M), dtype=np.float64)
@@ -90,17 +63,9 @@ def idct2(X):
             x[i, j] = sum_val
     return x
 
-
-# === RGB Extensions ===
 def dct2rgb(image_rgb):
     """
-    Apply 2D DCT to each RGB channel independently.
-
-    Args:
-        image_rgb (np.ndarray): 3D RGB image array (H x W x 3)
-
-    Returns:
-        np.ndarray: DCT coefficients for each channel
+    3 channel (RGB) 2 dimensional DCT-II
     """
     channels = []
     for i in range(3):
@@ -109,13 +74,7 @@ def dct2rgb(image_rgb):
 
 def idct2rgb(dct_rgb):
     """
-    Apply 2D IDCT to each RGB channel independently.
-
-    Args:
-        dct_rgb (np.ndarray): 3D DCT coefficients (H x W x 3)
-
-    Returns:
-        np.ndarray: Reconstructed RGB image (float64)
+    3 channel (RGB) 2 dimensional DCT-III
     """
     channels = []
     for i in range(3):

@@ -21,15 +21,12 @@ from dct.utils import (
 )
 import matplotlib.pyplot as plt
 
-# === 1D Signal Tests ===
 def test_1d_signals(dct_fn, idct_fn):
-    print("\n--- Testing 1D Signals (FAST) ---")
     signals = {
         "impulse": np.load("data/impulse_signal.npy"),
         "sine": np.load("data/sine_signal.npy"),
         "step": np.load("data/step_signal.npy")
     }
-
     for name, x in signals.items():
         print(f"\nSignal: {name}")
         X = dct_fn(x)
@@ -45,9 +42,7 @@ def test_1d_signals(dct_fn, idct_fn):
         # assert verify_parseval_identity(x, X)
         # assert verify_inverse_consistency(x, x_rec)
 
-# === 2D Grayscale Image Tests ===
 def test_grayscale_images(dct_fn, idct_fn):
-    print("\n--- Testing Grayscale Images (FAST) ---")
     images = ["data/nasir_ahmed.png"]
     for path in images:
         print(f"\nImage: {path}")
@@ -67,7 +62,7 @@ def test_grayscale_images(dct_fn, idct_fn):
                 total_freq_energy += np.sum(dct_block ** 2)
 
         rel_error = abs(total_time_energy - total_freq_energy) / total_time_energy
-        print(f"[Parseval] Time: {total_time_energy:.4f}, Freq: {total_freq_energy:.4f}, Rel Error: {rel_error:.2e}")
+        print(f"Parseval Energy: {total_time_energy:.4f}, Freq: {total_freq_energy:.4f}, Rel Error: {rel_error:.2e}")
         # assert rel_error < 1e-6
 
         rec_blocks = np.zeros_like(dct_blocks)
@@ -98,9 +93,7 @@ def test_grayscale_images(dct_fn, idct_fn):
         ssim = compute_ssim(img, img_rec)
         print(f"[{path}] PSNR: {psnr:.2f} dB, SSIM: {ssim:.4f}")
 
-# === 2D RGB Image Tests ===
 def test_rgb_images(dct_fn, idct_fn):
-    print("\n--- Testing RGB Images (FAST) ---")
     images = ["data/jack.jpg", "data/mary.jpg"]
 
     for path in images:
@@ -121,7 +114,7 @@ def test_rgb_images(dct_fn, idct_fn):
                 total_freq_energy += np.sum(dct_block ** 2)
 
         rel_error = abs(total_time_energy - total_freq_energy) / total_time_energy
-        print(f"[Parseval] Time: {total_time_energy:.4f}, Freq: {total_freq_energy:.4f}, Rel Error: {rel_error:.2e}")
+        print(f"Parseval Time: {total_time_energy:.4f}, Freq: {total_freq_energy:.4f}, Rel Error: {rel_error:.2e}")
         # assert rel_error < 1e-6
 
         rec_blocks = np.zeros_like(dct_blocks)
@@ -136,7 +129,6 @@ def test_rgb_images(dct_fn, idct_fn):
         ssim = compute_ssim(img, img_rec)
         print(f"[{path}] PSNR: {psnr:.2f} dB, SSIM: {ssim:.4f}")
 
-# === Run Tests ===
 if __name__ == "__main__":
     test_1d_signals(dct_lee, idct_lee)
     test_grayscale_images(dct_lee_2d, idct_lee_2d)
