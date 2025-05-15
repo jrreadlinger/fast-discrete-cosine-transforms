@@ -25,7 +25,7 @@ def dct_lee(vector):
         return result*scale
         # return result
 
-
+# "Butterfly algorithm": In this algorithm we hard code a size 8 1D vector to decrease the complexity from O(N^2) to O(NlogN)
 # Constants for the transform
 cos_vals = [math.cos(math.pi / 16 * i) for i in range(8)]
 scale_factors = [1 / (4 * c) for c in cos_vals]
@@ -39,7 +39,7 @@ transform_consts = [
     cos_vals[6],
 ]
 
-def fast_dct(input_vec):
+def fast_dct(input_vec): # input vector must be size 8
     # Stage 1: pairwise sum/diff
     sum07 = input_vec[0] + input_vec[7]
     sum16 = input_vec[1] + input_vec[6]
