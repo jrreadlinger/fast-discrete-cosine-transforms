@@ -145,6 +145,21 @@ def idct_lee(vector):
     result = inverse_transform(vector.copy())
     return np.array(result)
 
+def fast_dct(x):
+    """
+    Compute the DCT of a 1D array using a simplified version of Algorithm 749.
+    """
+    N = len(x)
+    X = np.zeros(N)
+    for k in range(N):
+        sum_val = 0
+        for n in range(N):
+            sum_val += x[n] * np.cos(np.pi * k * (2*n + 1) / (2 * N))
+        X[k] = sum_val
+    X[0] = X[0] / np.sqrt(N)
+    X[1:] = X[1:] * np.sqrt(2 / N)
+    return X
+
 def idct_lee_2d(matrix):
     matrix = np.asarray(matrix, dtype=float)
 
@@ -179,6 +194,7 @@ x = np.sin(2 * np.pi * np.arange(N) / N) + 0.5 * np.sin(4 * np.pi * np.arange(N)
 X_naive = dct_naive(x)
 X_fast = fast_dct_recursive(x)
 X_lee = dct_lee(x)
+X_fast = fast_dct(x)
 
 # Apply orthonormal scaling
 X_naive_norm = orthonormalize_dct(X_naive)
@@ -213,6 +229,7 @@ print(f"Relative error (Lee vs Naive): {err_lee:.2e}")
 sizes = [2**i for i in range(4, 11)]  # N = 16 to 1024
 naive_times = []
 lee_times = []
+faster = []
 
 for N in sizes:
     x = np.random.rand(N)
@@ -227,9 +244,15 @@ for N in sizes:
     dct_lee(x)
     lee_times.append(time.perf_counter() - start)
 
+    # Time Lee DCT
+    start = time.perf_counter()
+    fast_dct(x)
+    faster.append(time.perf_counter() - start)
+
 plt.figure(figsize=(8, 5))
 plt.loglog(sizes, naive_times, 'o-', label='Naive DCT')
 plt.loglog(sizes, lee_times, 's--', label='Lee DCT (fast)')
+plt.loglog(sizes, faster, 's--', label='faster DCT (fast)')
 plt.xlabel("Input size N")
 plt.ylabel("Execution time (seconds)")
 plt.title("DCT Runtime Scaling")
