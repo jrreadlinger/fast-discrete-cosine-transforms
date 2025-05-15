@@ -167,9 +167,30 @@ def mask_dct_coefficients(dct_block, keep=8):
     Returns:
         Masked DCT block
     """
+    keep = int(keep)
     masked = np.zeros_like(dct_block)
     masked[:keep, :keep] = dct_block[:keep, :keep]
     return masked
+
+# TODO: test this and give it a docstring
+def zigzag_mask_dct(dct_block, keep_fraction):
+    N = dct_block.shape[0]
+    flat = []
+    for i in range(2 * N - 1):
+        for j in range(i + 1):
+            x = j
+            y = i - j
+            if i % 2 == 0:
+                x, y = y, x
+            if x < N and y < N:
+                flat.append((x, y))
+
+    total = len(flat)
+    keep = int(keep_fraction * total)
+    mask = np.zeros_like(dct_block)
+    for idx in flat[:keep]:
+        mask[idx] = dct_block[idx]
+    return mask
 
 def normalize_image(img):
     """
